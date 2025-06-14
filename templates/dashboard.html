@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <script src="/static/js/dashboard.js" defer></script>
+
+</head>
+<body>
+    <div class="menu-wrapper">
+        <button id="menuButton" class="menu-button" style="width: 180px;" onclick="toggleMenu()">Menu</button>
+        <div id="menu" class="menu hidden">
+            <ul>
+                <li><button id="openModalAccessKey" class="menu-button small-button">Donner un accès à un/des participant(s)</button></li>
+                <li><button id="openModalCagnotteAdd" class="menu-button small-button">Ajouter une/des cagnotte(s)</button></li>
+                <li><button id="openModalCagnotteEdit" class="menu-button small-button">Modifier une/des cagnotte(s)</button></li>
+                <li><button id="openModalCagnotteDel" class="menu-button small-button">Supprimer une/des cagnotte(s)</button></li>
+                <li><button id="openModalParticipantAdd" class="menu-button small-button">Ajouter un/des participant(s)</button></li>
+                <li><button id="openModalParticipantEdit" class="menu-button small-button">Modifier un/des participant(s)</button></li>
+                <li><button id="openModalParticipantDel" class="menu-button small-button">Supprimer un/des participant(s)</button></li>
+                <li><button id="openModalAmountEdit" class="menu-button small-button">Modifier le montant d'un/des participant(s)</button></li>
+                <li><a href="/logout">Déconnexion</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <main class="dashboard-container">
+        <div class="content">
+            <h1>Mes cagnottes</h1>
+            {% for cagnotte in cagnottes %}
+                <div class="cagnotte-row">
+                    <div class="cagnotte-info">
+                        <h2>{{ cagnotte.name }}</h2>
+                        <p>{{ cagnotte.description if cagnotte.description else "Aucune description" }}</p>
+                        <p><strong>Montant :</strong> {{ "%.2f"|format(cagnotte.total_amount) }} €</p>
+                    </div>
+                    <div class="cagnotte-participants">
+                        <h3>Participants</h3>
+                        {% if cagnotte.participants %}
+                            <ul>
+                            {% for participant in cagnotte.participants %}
+                                <li>{{ participant.first_name }} {{ participant.last_name }} — {{ participant.amount }} €</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Aucun participant</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <div id="modalBackdropCagnotteAdd" class="hidden"></div>
+
+    <div id="modalOverlayCagnotteAdd" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorCagnotteAdd" class="error hidden"></div>
+            <button id="closeModalCagnotteAdd" class="modal-close">&times;</button>
+
+            <h2>Ajouter une/des cagnotte(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorCagnotteAdd">{{ error }}</p>
+            {% endif %}
+
+            <form id="cagnotteAdd">
+                <div id="cagnotteAdd-container">
+                    <div class="cagnotteAdd-entry">
+                        <input type="text" name="name" placeholder="Nom" required>
+                        <input type="text" name="description" placeholder="Description" required>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreCagnotteAdd" id="moreCagnotteAdd">+ Ajouter une cagnotte</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalBackdropCagnotteEdit" class="hidden"></div>
+
+    <div id="modalOverlayCagnotteEdit" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorCagnotteEdit" class="error hidden"></div>
+            <button id="closeModalCagnotteEdit" class="modal-close">&times;</button>
+
+            <h2>Modifier une/des cagnotte(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorCagnotteEdit">{{ error }}</p>
+            {% endif %}
+
+            <form id="cagnotteEdit">
+                <div id="cagnotteEdit-container">
+                    <div class="cagnotteEdit-entry">
+                        <select name="id_cagnotte" required>
+                            <option value="">-- Sélectionner une cagnotte --</option>
+                            {% for cagnotte in cagnottes %}
+                                <option value="{{ cagnotte.id }}">{{ cagnotte.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="name" placeholder="Nom">
+                        <input type="text" name="description" placeholder="Description">
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreCagnotteEdit" id="moreCagnotteEdit">+ Ajouter une cagnotte</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalBackdropCagnotteDel" class="hidden"></div>
+
+    <div id="modalOverlayCagnotteDel" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorCagnotteDel" class="error hidden"></div>
+            <button id="closeModalCagnotteDel" class="modal-close">&times;</button>
+
+            <h2>Supprimer une/des cagnotte(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorCagnotteDel">{{ error }}</p>
+            {% endif %}
+
+            <form id="cagnotteDel">
+                <div id="cagnotteDel-container">
+                    <div class="cagnotteDel-entry">
+                        <select name="id_cagnotte" required>
+                            <option value="">-- Sélectionner une cagnotte --</option>
+                            {% for cagnotte in cagnottes %}
+                                <option value="{{ cagnotte.id }}">{{ cagnotte.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreCagnotteDel" id="moreCagnotteDel">+ Ajouter une cagnotte</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalBackdropParticipantAdd" class="hidden"></div>
+
+    <div id="modalOverlayParticipantAdd" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorParticipantAdd" class="error hidden"></div>
+            <button id="closeModalParticipantAdd" class="modal-close">&times;</button>
+
+            <h2>Ajouter un/des participant(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorParticipantAdd">{{ error }}</p>
+            {% endif %}
+
+            <form id="participantAdd">
+                <div id="participantAdd-container">
+                    <div class="participantAdd-entry">
+                        <input type="text" name="first_name" placeholder="Prénom" required>
+                        <input type="text" name="last_name" placeholder="Nom" required>
+                        <input type="email" name="email" placeholder="Email" required>
+                        <input type="number" step="0.01" name="amount" placeholder="Montant" value="0" required>
+                        <select name="id_cagnotte" required>
+                            <option value="">-- Sélectionner une cagnotte --</option>
+                            {% for cagnotte in cagnottes %}
+                                <option value="{{ cagnotte.id }}">{{ cagnotte.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreParticipantAdd" id="moreParticipantAdd">+ Ajouter un participant</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalBackdropParticipantEdit" class="hidden"></div>
+
+    <div id="modalOverlayParticipantEdit" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorParticipantEdit" class="error hidden"></div>
+            <button id="closeModalParticipantEdit" class="modal-close">&times;</button>
+
+            <h2>Modifier un/des participant(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorParticipantEdit">{{ error }}</p>
+            {% endif %}
+
+            <form id="participantEdit">
+                <div id="participantEdit-container">
+                    <div class="participantEdit-entry">
+                        <select name="id_participant" required>
+                            <option value="">-- Sélectionner un participant --</option>
+                            {% for cagnotte in cagnottes %}
+                                <optgroup label="{{ cagnotte.name }}">
+                                    {% for participant in cagnotte.participants %}
+                                        <option value="{{ participant.id }}">{{ participant.first_name }} {{ participant.last_name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                        <input type="text" name="first_name" placeholder="Prénom">
+                        <input type="text" name="last_name" placeholder="Nom">
+                        <input type="email" name="email" placeholder="Email">
+                        <input type="number" step="0.01" name="amount" placeholder="Montant">
+                        <select name="id_cagnotte">
+                            <option value="">-- Sélectionner une cagnotte --</option>
+                            {% for cagnotte in cagnottes %}
+                                <option value="{{ cagnotte.id }}">{{ cagnotte.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreParticipantEdit" id="moreParticipantEdit">+ Ajouter un participant</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalBackdropParticipantDel" class="hidden"></div>
+
+    <div id="modalOverlayParticipantDel" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorParticipantDel" class="error hidden"></div>
+            <button id="closeModalParticipantDel" class="modal-close">&times;</button>
+
+            <h2>Supprimer un/des participant(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorParticipantDel">{{ error }}</p>
+            {% endif %}
+
+            <form id="participantDel">
+                <div id="participantDel-container">
+                    <div class="participantDel-entry">
+                        <select name="id_participant" required>
+                            <option value="">-- Sélectionner un participant --</option>
+                            {% for cagnotte in cagnottes %}
+                                <optgroup label="{{ cagnotte.name }}">
+                                    {% for participant in cagnotte.participants %}
+                                        <option value="{{ participant.id }}">{{ participant.first_name }} {{ participant.last_name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreParticipantDel" id="moreParticipantDel">+ Supprimer un participant</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalBackdropAmountEdit" class="hidden"></div>
+
+    <div id="modalOverlayAmountEdit" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorAmountEdit" class="error hidden"></div>
+            <button id="closeModalAmountEdit" class="modal-close">&times;</button>
+
+            <h2>Modifier le montant d'un/des participant(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorAmountEdit">{{ error }}</p>
+            {% endif %}
+
+            <form id="amountEdit">
+                <div id="amountEdit-container">
+                    <div class="amountEdit-entry">
+                        <select name="id_participant" required>
+                            <option value="">-- Sélectionner un participant --</option>
+                            {% for cagnotte in cagnottes %}
+                                <optgroup label="{{ cagnotte.name }}">
+                                    {% for participant in cagnotte.participants %}
+                                        <option value="{{ participant.id }}">{{ participant.first_name }} {{ participant.last_name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                        <input type="number" step="0.01" name="amount" placeholder="Montant" required>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreAmountEdit" id="moreAmountEdit">+ Ajouter une modification</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalBackdropAccessKey" class="hidden"></div>
+
+    <div id="modalOverlayAccessKey" class="modal-overlay hidden">
+        
+        <div class="modal-content">
+            <div id="modal-errorAccessKey" class="error hidden"></div>
+            <button id="closeModalAccessKey" class="modal-close">&times;</button>
+
+            <h2>Modifier le montant d'un/des participant(s)</h2>
+
+            {% if error %}
+                <p class="modal-errorAccessKey">{{ error }}</p>
+            {% endif %}
+
+            <form id="accessKey">
+                <div id="accessKey-container">
+                    <div class="accessKey-entry">
+                        <select name="id_participant" required>
+                            <option value="">-- Sélectionner un participant --</option>
+                            {% for cagnotte in cagnottes %}
+                                <optgroup label="{{ cagnotte.name }}">
+                                    {% for participant in cagnotte.participants %}
+                                        <option value="{{ participant.id }}">{{ participant.first_name }} {{ participant.last_name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-4">
+                    <button type="moreAccessKey" id="moreAccessKey">+ Ajouter un accès</button>
+                    <button type="submit">Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

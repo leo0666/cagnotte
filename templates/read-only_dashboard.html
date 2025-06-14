@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Lecture Seule</title>
+    <link rel="stylesheet" href="/static/css/read-only_dashboard.css">
+</head>
+<body>
+    <main class="dashboard-container">
+        <div class="content">
+            <h1>Vous êtes dans les cagnottes suivantes:</h1>
+            {% for cagnotte in cagnottes %}
+                <div class="cagnotte-row">
+                    <div class="cagnotte-info">
+                        <h2>{{ cagnotte.name }}</h2>
+                        <p>{{ cagnotte.description if cagnotte.description else "Aucune description" }}</p>
+                        <p><strong>Montant :</strong> {{ "%.2f"|format(cagnotte.total_amount) }} €</p>
+                    </div>
+                    <div class="cagnotte-participants">
+                        <h3>Participants</h3>
+                        {% if cagnotte.participants %}
+                            <ul>
+                            {% for participant in cagnotte.participants %}
+                                <li>{{ participant.first_name }} {{ participant.last_name }} — {{ "%.2f"|format(participant.amount) }} €</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Aucun participant</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/css/register.css">
+    <script src="/static/js/register.js" defer></script>
+</head>
+<body>
+    <form>
+        <h1>Créer un compte</h1>
+        <div id="error-message" class="error-message">
+            {% if error %}{{ error }}{% endif %}
+        </div>
+        <label>Prénom :
+            <input type="text" name="first_name" required>
+        </label>
+        <label>Nom :
+            <input type="text" name="last_name" required>
+        </label>
+        <label>Email :
+            <input type="email" name="email" required>
+        </label>
+        <label>Nom d'utilisateur :
+            <input type="text" name="username" required>
+        </label>
+        <label>Mot de passe :
+            <input type="password" name="pwd" required>
+        </label>
+        <label>Confirmation du mot de passe :
+            <input type="password" name="pwd_confirmed" required>
+        </label>
+        <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+        <button type="submit">Connexion</button>
+    </form>
+</body>
+</html>

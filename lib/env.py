@@ -12,4 +12,5 @@ JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 ACCESS_TOKEN_EXPIRE = datetime.timedelta(minutes=60)
 REFRESH_TOKEN_EXPIRE = datetime.timedelta(days=1)
 
-PH = os.getenv("PH")
+SMTP_USER = os.getenv("SMTP_USER")
+SMTP_PWD = os.getenv("SMTP_PWD")

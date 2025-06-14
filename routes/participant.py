@@ -8,6 +8,7 @@ import aiomysql, secrets
 
 from lib.db import get_db
 from lib.token import jwt_required
+from lib.env import SMTP_USER, SMTP_PWD
 from routes.cagnotte import calc_total_amount
 from shema.participant_add import ParticipantAdd
 from shema.participant_edit import ParticipantEdit
@@ -22,8 +23,8 @@ async def generate_access_key():
     return secrets.token_urlsafe(64)
 
 async def send_email_access_key(participant, access_url: str):
-    smtp_username = "leolepinette24@gmail.com"
-    smtp_password = "hmnswhomecxcroxp"
+    smtp_username = SMTP_USER
+    smtp_password = SMTP_PWD
     destinataire = participant["email"]
 
     sujet = "Accès aux cagnottes"
